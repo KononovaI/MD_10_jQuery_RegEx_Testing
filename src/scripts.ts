@@ -8,7 +8,7 @@ $(".js-form-wrapper").html(
 	`<form class="js-validation-form">
 		<label for="name">
 			<h3>Enter your username:</h3>
-			<input type="text" id="name" class="form-input js-name" placeholder="Name" title="At least 2 characters, but less than 51. Without digits and special characters!"/>
+			<input type="text" id="name" class="form-input js-name" placeholder="Name" title="At least 2 characters, but less than 51. Without digits and special characters!" autocomplete="off"/>
 		</label>
 		<label for="email">
 			<h3>Enter your email:</h3>
@@ -26,20 +26,31 @@ $(".js-form-wrapper").html(
 $(".js-validation-form").on("submit", (e) => {
   e.preventDefault(); // Izslēdzam default uzvedību uz pārlādi
 
-  // Jādabū vērtības no input laukiem. Uzreiz pievienot toString(), jo savādāk inputa konstante uzņemas tipu 'string | number | string[]'
-  const emailInput = $(".js-email").val().toString();
-  const nameInput = $(".js-name").val().toString();
-  const passwordInput = $(".js-password").val().toString();
+  // Jādabū vērtības no input laukiem. Uzreiz pievienot toString(), jo savādāk inputa konstante uzņemas tipu 'string | number | string[]
+  // Ar jQuery selectojam inputa laukus, ar kuriem darbosimies:
+  const emailInput = $(".js-email");
+  const nameInput = $(".js-name");
+  const passwordInput = $(".js-password");
+
+  // Piemērojam jQuery val() metodi, lai dabūtu vērtību atrastajā elementā. Daļa ?.toString() ļauj nolasīt vērtību, nepārbaudot, vai viss ir truthy, bet gan atgriež undefined īsajā versijā. Savukārt ||"" aizvieto value ar tukšu stringu, ja dabūjam undefined.
+  const emailValue = emailInput.val()?.toString() || "";
+  const nameValue = nameInput.val()?.toString() || "";
+  const passwordValue = passwordInput.val()?.toString() || "";
 
   // Te notiek pārbaude pēc validācijas funkcijām:
-  const emailIsValid = emailValidation(emailInput);
-  const nameIsValid = nameValidation(nameInput);
-  const passwordIsValid = passwordValidation(passwordInput);
+  const emailIsValid = emailValidation(emailValue);
+  const nameIsValid = nameValidation(nameValue);
+  const passwordIsValid = passwordValidation(passwordValue);
 
   /* Double check'am skat. vai ielasās vērtības, kas ievadītas input laukos:
 	console.log(emailIsValid)
 	console.log(nameIsValid)
 	console.log(passwordIsValid) */
+
+  // Jānotīra forma, lai nespamotu ar iepriekš ievadītiem datiem:
+  emailInput.val("");
+  nameInput.val("");
+  passwordInput.val("");
 
   // Ielasās Toastify funkcija (definēta zemāk) ar individualizētu tekstu un fona krāsu, atkarībā no rezultāta:
   if (emailIsValid && nameIsValid && passwordIsValid) {
